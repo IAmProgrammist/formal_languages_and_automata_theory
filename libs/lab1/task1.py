@@ -1,21 +1,26 @@
-def solve_context_free_grammar_left(grammar_dict, commands):
+def get_available_grammars_left(grammar_dict, chain):
+    available_grammars = []
+    min_index = len(chain)
+    for i in range(0, len(grammar_dict)):
+        grammar = grammar_dict[i]
+        if (index := chain.find(grammar[0])) != -1 and index < min_index:
+            available_grammars = [(i, grammar)]
+            min_index = index
+        elif index == min_index:
+            available_grammars.append((i, grammar))
+    return available_grammars
+
+def solve_context_free_grammar_left(grammar_dict, commands, chain=None, tree=None):
     # Инициализация цепочки, дерева
-    chain = "S"
-    tree = "S"
+    if not chain:
+        chain = "S"
+        tree = "S"
     step = 0
 
     # Пока в цепочке есть нетерминальные символы и пул команд непустой
     while any([v.isupper() for v in chain]) and step < len(commands):
         # Определяем доступные грамматики
-        available_grammars = []
-        min_index = len(chain)
-        for i in range(0, len(grammar_dict)):
-            grammar = grammar_dict[i]
-            if (index := chain.find(grammar[0])) != -1 and index < min_index:
-                available_grammars = [(i, grammar)]
-                min_index = index
-            elif index == min_index:
-                available_grammars.append((i, grammar))
+        available_grammars = get_available_grammars_left(grammar_dict, chain)
 
         # Если команды нет в доступных грамматиках, возвращаем False
         if commands[step] not in [available_grammar[0] for available_grammar in available_grammars]:
@@ -35,7 +40,7 @@ def solve_context_free_grammar_left(grammar_dict, commands):
         step += 1
 
     # Если выполнены не все команды, выходим с ошибкой
-    if len(commands) != step:
+    if len(commands) != step or any([v.isupper() for v in chain]):
         return (False, chain, tree)
 
     return (True, chain, tree)
