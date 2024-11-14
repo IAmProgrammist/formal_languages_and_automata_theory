@@ -1,83 +1,53 @@
 MESSAGES = {
-    -1: "Отвергнуть, последовательность пуста",
-    -2: "Отвергнуть, невалидный входной символ",
-    -3: "Отвергнуть, слишком короткая цепочка",
-    -4: "Отвергнуть, последние два символа не содержат 1",
-    0: "Допустить"
+    -1: "Отвергнуть, невалидный входной символ",
+    0:  "Отвергнуть, цепочка не содержит 1 на одной из двух последних позиций",
+    1:  "Допустить",
+    2:  "Допустить"
 }
 
-def S1(input):
-    if len(input) == 0:
-        return -1
 
-    if input[0] == '1':
-        return S2(input[1:])
-    elif input[0] == '0':
-        return S3(input[1:])
-    else:
-        return -2
+def l3_validator(l3_input):
+    original_input = l3_input
+    s = 0
+    while len(l3_input) > 0 and s >= 0:
+        current_symbol = l3_input[0]
+        if s == 0:
+            if current_symbol == "1":
+                s = 1
+            elif current_symbol == "0":
+                s = 0
+            else:
+                s = -1
+                break
+        elif s == 1:
+            if current_symbol == "1":
+                s = 1
+            elif current_symbol == "0":
+                s = 2
+            else:
+                s = -1
+                break
+        elif s == 2:
+            if current_symbol == "1":
+                s = 1
+            elif current_symbol == "0":
+                s = 0
+            else:
+                s = -1
+                break
 
-def S2(input):
-    if len(input) == 0:
-        return -3
+        l3_input = l3_input[1:]
 
-    if input[0] == '1':
-        return S4(input[1:])
-    elif input[0] == '0':
-        return S5(input[1:])
-    else:
-        return -2
-
-def S3(input):
-    if len(input) == 0:
-        return -4
-
-    if input[0] == '1':
-        return S4(input[1:])
-    elif input[0] == '0':
-        return S3(input[1:])
-    else:
-        return -2
-
-
-def S4(input):
-    if len(input) == 0:
-        return 0
-
-    if input[0] == '1':
-        return S4(input[1:])
-    elif input[0] == '0':
-        return S5(input[1:])
-    else:
-        return -2
-
-
-def S5(input):
-    if len(input) == 0:
-        return 0
-
-    if input[0] == '1':
-        return S4(input[1:])
-    elif input[0] == '0':
-        return S3(input[1:])
-    else:
-        return -2
-
-def L3validator(input):
-    result = S1(input)
-    print(input, MESSAGES[result])
-    return result
+    print(original_input, MESSAGES[s])
+    return s
 
 
 # Тестовые данные для всех переходов
-assert L3validator("10001101") == 0
-assert L3validator("11") == 0
-assert L3validator("01") == 0
-
+assert l3_validator("0110100") == 0
+assert l3_validator("21") == -1
 
 # Тестовые данные для всех состояний
-assert L3validator("") == -1
-assert L3validator("1") == -3
-assert L3validator("0") == -4
-assert L3validator("11") == 0
-assert L3validator("10") == 0
+assert l3_validator("") == 0
+assert l3_validator("1") == 1
+assert l3_validator("10") == 2
+assert l3_validator("21") == -1
